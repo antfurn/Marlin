@@ -18,6 +18,7 @@
 #endif
 
   static unsigned char blink = 0;	// Variable for visualization of fan rotation in GLCD
+  static unsigned char animate_pos = 0;
 
   #define LCD_MESSAGEPGM(x) lcd_setstatuspgm(PSTR(x))
   #define LCD_ALERTMESSAGEPGM(x) lcd_setalertstatuspgm(PSTR(x))

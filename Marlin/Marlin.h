@@ -220,6 +220,8 @@ extern float max_pos[3];
 extern bool axis_known_position[3];
 extern float zprobe_zoffset;
 extern int fanSpeed;
+extern int ledBright;
+extern bool coolingFans[3];
 #ifdef BARICUDA
 extern int ValvePressure;
 extern int EtoPPressure;

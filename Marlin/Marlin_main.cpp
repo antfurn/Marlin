@@ -232,6 +232,8 @@ float extruder_offset[NUM_EXTRUDER_OFFSETS][EXTRUDERS] = {
 #endif
 uint8_t active_extruder = 0;
 int fanSpeed=0;
+int ledBright=0;
+bool coolingFans[3] = {false, false, false};
 #ifdef SERVO_ENDSTOPS
   int servo_endstops[] = SERVO_ENDSTOPS;
   int servo_endstop_angles[] = SERVO_ENDSTOP_ANGLES;
@@ -1816,6 +1818,10 @@ void process_commands()
       #if defined(FAN_PIN) && FAN_PIN > -1
         if (pin_number == FAN_PIN)
           fanSpeed = pin_status;
+      #endif
+      #if defined(LED_PIN) && LED_PIN > -1
+        if (pin_number == LED_PIN)
+          ledBright = pin_status;
       #endif
         if (pin_number > -1)
         {

@@ -162,6 +162,7 @@ bool lcd_oldcardstatus;
 menuFunc_t currentMenu = lcd_status_screen; /* function pointer to the currently active menu */
 uint32_t lcd_next_update_millis;
 uint8_t lcd_status_update_delay;
+uint32_t lcd_next_animate_millis;
 uint8_t lcdDrawUpdate = 2;                  /* Set to none-zero when the LCD needs to draw, decreased after every draw. Set to 2 in LCD routines so the LCD gets at least 1 full redraw (first redraw is partial) */
 
 //prevMenu and prevEncoderPosition are used to store the previous menu location when editing settings.
@@ -185,6 +186,13 @@ static void lcd_status_screen()
         lcdDrawUpdate = 1;
     if (lcdDrawUpdate)
     {
+        if ( lcd_next_animate_millis < millis() )
+        {
+            animate_pos++;
+            if(animate_pos > 3) animate_pos =0;
+            lcd_next_animate_millis = millis() + 500;
+        }
+
         lcd_implementation_status_screen();
         lcd_status_update_delay = 10;   /* redraw the main screen every second. This is easier then trying keep track of all things that change on the screen */
     }
@@ -259,6 +267,12 @@ static void lcd_sdcard_stop()
 }
 
 /* Menu implementation */
+
+static void set_LED_brightness()
+{
+    analogWrite(LED_PIN, ledBright);
+}
+
 static void lcd_main_menu()
 {
     START_MENU();
@@ -293,6 +307,7 @@ static void lcd_main_menu()
 #endif
     }
 #endif
+    MENU_ITEM_EDIT_CALLBACK(int3, MSG_LED_BRIGHT, &ledBright, 0, 255, set_LED_brightness);
     END_MENU();
 }
 

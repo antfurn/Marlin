@@ -363,7 +363,12 @@ void checkExtruderAutoFans()
   // which fan pins need to be turned on?      
   #if defined(EXTRUDER_0_AUTO_FAN_PIN) && EXTRUDER_0_AUTO_FAN_PIN > -1
     if (current_temperature[0] > EXTRUDER_AUTO_FAN_TEMPERATURE) 
+    {
       fanState |= 1;
+      coolingFans[0] = true;
+    }
+    else
+      coolingFans[0] = false;
   #endif
   #if defined(EXTRUDER_1_AUTO_FAN_PIN) && EXTRUDER_1_AUTO_FAN_PIN > -1
     if (current_temperature[1] > EXTRUDER_AUTO_FAN_TEMPERATURE) 
@@ -372,7 +377,11 @@ void checkExtruderAutoFans()
         fanState |= 1;
       else
         fanState |= 2;
+
+      coolingFans[1] = true;
     }
+    else
+      coolingFans[1] = false;
   #endif
   #if defined(EXTRUDER_2_AUTO_FAN_PIN) && EXTRUDER_2_AUTO_FAN_PIN > -1
     if (current_temperature[2] > EXTRUDER_AUTO_FAN_TEMPERATURE) 
@@ -383,7 +392,11 @@ void checkExtruderAutoFans()
         fanState |= 2;
       else
         fanState |= 4;
+
+      coolingFans[2] = true;
     }
+    else
+      coolingFans[2] = false;
   #endif
   
   // update extruder auto fan states

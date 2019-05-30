@@ -78,7 +78,7 @@
 #endif
 
 // Define this to set a custom name for your generic Mendel,
-// #define CUSTOM_MENDEL_NAME "This Mendel"
+#define CUSTOM_MENDEL_NAME "AO-101"
 
 // Define this to set a unique identifier for this printer, (Used by some programs to differentiate between machines)
 // You can use an online service to generate a random UUID. (eg http://www.uuidgenerator.net/version4)
@@ -162,7 +162,7 @@
 #define HEATER_0_MAXTEMP 255
 #define HEATER_1_MAXTEMP 255
 #define HEATER_2_MAXTEMP 255
-#define BED_MAXTEMP 150
+#define BED_MAXTEMP 120
 
 // If your bed has low resistance e.g. .6 ohm and throws the fuse you can duty cycle it to reduce the
 // average current. The value should be an integer and the heat bed will be turned on for 1 interval of
@@ -204,11 +204,21 @@
 //    #define  DEFAULT_Ki 2.25
 //    #define  DEFAULT_Kd 440
 
-// AJF Buda2
-    #define  DEFAULT_Kp 100.95
-    #define  DEFAULT_Ki 9.34
-    #define  DEFAULT_Kd 272.90
-
+// AJF Buda2 - E0 - No cooling fan
+//    #define  DEFAULT_Kp 100.95
+//    #define  DEFAULT_Ki 9.34
+//    #define  DEFAULT_Kd 272.90
+    
+// AJF Buda2 - E0 - WITH cooling fan
+    #define  DEFAULT_Kp 100.30
+    #define  DEFAULT_Ki 9.87
+    #define  DEFAULT_Kd 254.72
+    
+// AJF Buda1.2 - E1 - WITH cooling fan
+    #define  DEFAULT_Kp_2 190.01
+    #define  DEFAULT_Ki_2 25.89
+    #define  DEFAULT_Kd_2 348.67
+     
 #endif // PIDTEMP
 
 // Bed Temperature Control
@@ -506,11 +516,12 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 //LCD and SD support
 //#define ULTRA_LCD  //general LCD support, also 16x2
 //#define DOGLCD  // Support for SPI LCD 128x64 (Controller ST7565R graphic Display Family)
-#define SDSUPPORT // Enable SD Card Support in Hardware Console
+#define TinyOLED // U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NO_ACK);	// Display which does not send ACK
+//#define SDSUPPORT // Enable SD Card Support in Hardware Console
 //#define SDSLOW // Use slower SD transfer mode (not normally needed - uncomment if you're getting volume init error)
 //#define SD_CHECK_AND_RETRY // Use CRC checks and retries on the SD communication
-//#define ENCODER_PULSES_PER_STEP 1 // Increase if you have a high resolution encoder
-//#define ENCODER_STEPS_PER_MENU_ITEM 5 // Set according to ENCODER_PULSES_PER_STEP or your liking
+#define ENCODER_PULSES_PER_STEP 4 // Increase if you have a high resolution encoder
+#define ENCODER_STEPS_PER_MENU_ITEM 1 // Set according to ENCODER_PULSES_PER_STEP or your liking
 //#define ULTIMAKERCONTROLLER //as available from the Ultimaker online store.
 //#define ULTIPANEL  //the UltiPanel as on Thingiverse
 //#define LCD_FEEDBACK_FREQUENCY_HZ 1000	// this is the tone frequency the buzzer plays when on UI feedback. ie Screen Click
@@ -553,6 +564,15 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
  #define DEFAULT_LCD_CONTRAST 17
 #endif
 
+//automatic expansion
+#if defined (TinyOLED)
+ #define DOGLCD
+ #define SDSUPPORT
+ #define ULTIPANEL
+ #define NEWPANEL
+ #define DEFAULT_LCD_CONTRAST 17
+#endif
+
 #if defined (REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER)
  #define DOGLCD
  #define U8GLIB_ST7920
@@ -568,6 +588,7 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
   #define NEWPANEL
   #define ULTIPANEL
 #endif
+
 #if defined(RA_CONTROL_PANEL)
  #define ULTIPANEL
  #define NEWPANEL

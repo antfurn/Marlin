@@ -39,6 +39,9 @@
 #elif MOTHERBOARD == 88
 	#define MACHINE_NAME "Makibox"
 	#define FIRMWARE_URL "https://github.com/ErikZalm/Marlin/"
+#elif MOTHERBOARD == 301
+	#define MACHINE_NAME "    AO-101"
+	#define FIRMWARE_URL "https://github.com/ErikZalm/Marlin/"
 #else
 	#ifdef CUSTOM_MENDEL_NAME
 		#define MACHINE_NAME CUSTOM_MENDEL_NAME
@@ -186,6 +189,7 @@
 	#define MSG_BABYSTEP_Y "Babystep Y"
 	#define MSG_BABYSTEP_Z "Babystep Z"
 	#define MSG_ENDSTOP_ABORT "Endstop abort"
+	#define MSG_LED_BRIGHT "LED Shine"
 
 // Serial Console Messages
 
@@ -2676,4 +2680,4 @@
 	
 #endif
 
-#endif // ifndef LANGUAGE_H
+#endif // ifndef LANGUAGE_H

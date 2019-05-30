@@ -2189,14 +2189,53 @@ DaveX plan for Teensylu/printrboard-type pinouts (ref teensylu & sprinter) for a
 
 #if MOTHERBOARD == 301
 #define KNOWN_BOARD
-/*****************************************************************
+/*********************************************************************************************************************************************************************************************
+**********************************************************************************************************************************************************************************************
+**********************************************************************************************************************************************************************************************
+**********************************************************************************************************************************************************************************************
+**********************************************************************************************************************************************************************************************
 * Rambo Pin Assignments
-******************************************************************/
+**********************************************************************************************************************************************************************************************
+**********************************************************************************************************************************************************************************************
+**********************************************************************************************************************************************************************************************
+**********************************************************************************************************************************************************************************************
+*********************************************************************************************************************************************************************************************/
 
 #ifndef __AVR_ATmega2560__
 #error Oops!  Make sure you have 'Arduino Mega 2560' selected from the 'Tools -> Boards' menu.
 #endif
 
+/* // Unused (still)
+    4       PWM-Ext 6 // PSU-ON
+    A3 (57) Analog-Ext 6
+    A4 (58) Analog-Ext 5
+    A5 (59) Analog-Ext 4
+    A6 (60) Analog-Ext 3
+    A7 (61) Analog-Ext 2 // Thermistor 3
+    A8 (62) Analog-Ext 1
+    57-62   // 54 to 56 used because A0 & A1 & A2 are used (see note below)
+   !! NOTE: On the Mega, Analog pins 0-15 and Digital pins 54-69 refer to the same hardware pin on the chip.
+ 
+   // Unused but not assinged here
+    14-19   Serial 10-5
+    
+   // Pins I've now used  !!!
+    5       PWM-Ext 5 // FAN 2    
+    2       PWM-Ext 4 // Photo Control
+    13      PWM-Ext 3 // LED // Lighting LEDS
+    
+   // used but not assinged here
+    20      I2C SDA
+    21      I2C SCL
+    22      MX1-3 Enable
+    31      MX2-4 Step
+    32      MX1-4 Step
+    44      MX1-5 Direction
+    45      MX2-5 Direction
+    46      MX3-5 Direction
+    50-52   MISO 3, MOSI 4, SCK 5
+ */
+ 
 #define LARGE_FLASH true
 
 #define X_STEP_PIN 37
@@ -2224,13 +2263,13 @@ DaveX plan for Teensylu/printrboard-type pinouts (ref teensylu & sprinter) for a
 #define Z_MS2_PIN 67
 
 #define HEATER_BED_PIN 3
-#define TEMP_BED_PIN 2
+#define TEMP_BED_PIN 2  //A2
 
 #define HEATER_0_PIN  9
-#define TEMP_0_PIN 0
+#define TEMP_0_PIN 0  //A0
 
 #define HEATER_1_PIN 7
-#define TEMP_1_PIN 1
+#define TEMP_1_PIN 1  //A1
 
 #ifdef BARICUDA
 #define HEATER_2_PIN 6
@@ -2242,27 +2281,54 @@ DaveX plan for Teensylu/printrboard-type pinouts (ref teensylu & sprinter) for a
 #define E0_STEP_PIN         34
 #define E0_DIR_PIN          43
 #define E0_ENABLE_PIN       26
-#define E0_MS1_PIN 65
-#define E0_MS2_PIN 66
+#define E0_MS1_PIN          65
+#define E0_MS2_PIN          66
 
 #define E1_STEP_PIN         33
 #define E1_DIR_PIN          42
 #define E1_ENABLE_PIN       25
-#define E1_MS1_PIN 63
-#define E1_MS2_PIN 64
+#define E1_MS1_PIN          63
+#define E1_MS2_PIN          64
 
-#define DIGIPOTSS_PIN 38
+#define DIGIPOTSS_PIN       38
 #define DIGIPOT_CHANNELS {4,5,3,0,1} // X Y Z E0 E1 digipot channels to stepper driver mapping
 
 #define SDPOWER            -1
 #define SDSS               53
 #define LED_PIN            13
-#define FAN_PIN            8
-#define FAN_PIN1           6
-#define PS_ON_PIN          4
+#define FAN_PIN            5 //8
+#define FAN1_PIN           6
+#define FAN2_PIN           8 //5
+#define PHOTO_PIN          4
+#define PS_ON_PIN          -1 //4
 #define KILL_PIN           -1 //80 with Smart Controller LCD
 #define SUICIDE_PIN        -1  //PIN that has to be turned on right after start, to keep power flowing.
 
+#ifdef TinyOLED
+    #define KILL_PIN 79   //80
+    #define BEEPER 80     //79      // Beeper on AUX-4
+     //The encoder and click button
+    #define BTN_EN1 76
+    #define BTN_EN2 77
+    #define BTN_ENC 78  //the click
+    // For testing on bare mega only
+    //#define BTN_EN1 14  // DIO70_PIN // PG4
+    //#define BTN_EN2 15  // DIO70_PIN // PG3
+    //#define BTN_ENC 16 //the click
+   
+    #define BLEN_C 2
+    #define BLEN_B 1
+    #define BLEN_A 0  
+   
+     //encoder rotation values
+    #define encrot0 0
+    #define encrot1 2
+    #define encrot2 3
+    #define encrot3 1
+    
+#endif //TinyOLED
+    
+     /*
 #ifdef ULTRA_LCD
   #define KILL_PIN 80
   #ifdef NEWPANEL
@@ -2326,7 +2392,7 @@ DaveX plan for Teensylu/printrboard-type pinouts (ref teensylu & sprinter) for a
     #define BLEN_A 0
   #endif
 #endif //ULTRA_LCD
-
+*/
 
 #endif
 

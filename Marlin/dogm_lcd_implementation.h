@@ -75,6 +75,7 @@
 #define FONT_STATUSMENU	u8g_font_6x9
 
 int lcd_contrast;
+void* Fans_bmp[4];
 
 // LCD selection
 #ifdef U8GLIB_ST7920
@@ -83,6 +84,9 @@ U8GLIB_ST7920_128X64_RRD u8g(0);
 #elif defined(MAKRPANEL)
 // The MaKrPanel display, ST7565 controller as well
 U8GLIB_NHD_C12864 u8g(DOGLCD_CS, DOGLCD_A0);
+#elif defined(TinyOLED)
+//U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NO_ACK);	// Display which does not send ACK
+U8GLIB_SH1106_128X64 u8g(U8G_I2C_OPT_NONE);	// I2C / TWI
 #else
 // for regular DOGM128 display with HW-SPI
 U8GLIB_DOGM128 u8g(DOGLCD_CS, DOGLCD_A0);	// HW-SPI Com: CS, A0
@@ -90,6 +94,11 @@ U8GLIB_DOGM128 u8g(DOGLCD_CS, DOGLCD_A0);	// HW-SPI Com: CS, A0
 
 static void lcd_implementation_init()
 {
+    Fans_bmp[0] = (void*)Fan0_bmp;
+    Fans_bmp[1] = (void*)Fan1_bmp;
+    Fans_bmp[2] = (void*)Fan2_bmp;
+    Fans_bmp[3] = (void*)Fan3_bmp;
+
 #ifdef LCD_PIN_BL
 	pinMode(LCD_PIN_BL, OUTPUT);	// Enable LCD backlight
 	digitalWrite(LCD_PIN_BL, HIGH);
@@ -124,7 +133,8 @@ static void lcd_implementation_init()
 	u8g.firstPage();
 	do {
 			// RepRap init bmp
-			u8g.drawBitmapP(0,0,START_BMPBYTEWIDTH,START_BMPHEIGHT,start_bmp);
+			//u8g.drawBitmapP(0,0,START_BMPBYTEWIDTH,START_BMPHEIGHT,start_bmp);
+			u8g.drawBitmapP(0,0,LULZBOT_BMPBYTEWIDTH,LULZBOT_BMPHEIGHT,lulzbot_bmp);
 			// Welcome message
 			u8g.setFont(u8g_font_6x10_marlin);
 			u8g.drawStr(62,10,"MARLIN"); 
@@ -175,9 +185,7 @@ static void lcd_implementation_status_screen()
  
  u8g.setColorIndex(1);	// black on white
  
- // Symbols menu graphics, animated fan
- if ((blink % 2) &&  fanSpeed )	u8g.drawBitmapP(9,1,STATUS_SCREENBYTEWIDTH,STATUS_SCREENHEIGHT,status_screen0_bmp);
-	else u8g.drawBitmapP(9,1,STATUS_SCREENBYTEWIDTH,STATUS_SCREENHEIGHT,status_screen1_bmp);
+ // Symbols menu graphics,
  
  #ifdef SDSUPPORT
  //SD Card Symbol
@@ -212,89 +220,81 @@ static void lcd_implementation_status_screen()
 			lcd_printPGM(PSTR("--:--"));
 		 }
  #endif
- 
- // Extruder 1
- u8g.setFont(FONT_STATUSMENU);
- u8g.setPrintPos(6,6);
- u8g.print(itostr3(int(degTargetHotend(0) + 0.5)));
- lcd_printPGM(PSTR(LCD_STR_DEGREE " "));
- u8g.setPrintPos(6,27);
- u8g.print(itostr3(int(degHotend(0) + 0.5)));
- lcd_printPGM(PSTR(LCD_STR_DEGREE " "));
- if (!isHeatingHotend(0)) u8g.drawBox(13,17,2,2);
-	else
-		{
-		 u8g.setColorIndex(0);	// white on black
-		 u8g.drawBox(13,17,2,2);
-		 u8g.setColorIndex(1);	// black on white
-		}
- 
- // Extruder 2
- u8g.setFont(FONT_STATUSMENU);
- #if EXTRUDERS > 1
- u8g.setPrintPos(31,6);
- u8g.print(itostr3(int(degTargetHotend(1) + 0.5)));
- lcd_printPGM(PSTR(LCD_STR_DEGREE " "));
- u8g.setPrintPos(31,27);
- u8g.print(itostr3(int(degHotend(1) + 0.5)));
- lcd_printPGM(PSTR(LCD_STR_DEGREE " "));
- if (!isHeatingHotend(1)) u8g.drawBox(38,17,2,2);
-	else
-		{
-		 u8g.setColorIndex(0);	// white on black
-		 u8g.drawBox(38,17,2,2);
-		 u8g.setColorIndex(1);	// black on white
-		}
- #else
- u8g.setPrintPos(31,27);
- u8g.print("---");
+
+ #if EXTRUDERS > 2 // Three extruders
+  #define start_spacing 4 // (8/2)
+  #define graphic_spacing ((128-8)/5)
+ #elif EXTRUDERS > 1 // Two extruders
+  #define start_spacing 8 // (16/2)
+  #define graphic_spacing ((128-8)/4)
+ #else // only One extruder
+  #define start_spacing 12 // (23/2)
+  #define graphic_spacing ((128-23)/3)
  #endif
- 
- // Extruder 3
- u8g.setFont(FONT_STATUSMENU);
- # if EXTRUDERS > 2
- u8g.setPrintPos(55,6);
- u8g.print(itostr3(int(degTargetHotend(2) + 0.5)));
- lcd_printPGM(PSTR(LCD_STR_DEGREE " "));
- u8g.setPrintPos(55,27);
- u8g.print(itostr3(int(degHotend(2) + 0.5)));
- lcd_printPGM(PSTR(LCD_STR_DEGREE " "));
- if (!isHeatingHotend(2)) u8g.drawBox(62,17,2,2);
-	else
-		{
-		 u8g.setColorIndex(0);	// white on black
-		 u8g.drawBox(62,17,2,2);
-		 u8g.setColorIndex(1);	// black on white
-		}
- #else
- u8g.setPrintPos(55,27);
- u8g.print("---");
- #endif
- 
+
+ for ( int extrdr=0; extrdr < EXTRUDERS; ++extrdr )
+ {
+     u8g.drawBitmapP(start_spacing+(graphic_spacing*extrdr),0,HOTEND_BMPBYTEWIDTH,HOTEND_BMPHEIGHT,HotEnd_bmp);
+    
+     u8g.setFont(FONT_STATUSMENU);
+     u8g.setColorIndex(0);	// black on white
+     u8g.setPrintPos(start_spacing+(graphic_spacing*extrdr),14);
+     if ( degTargetHotend(extrdr) > 0 )
+     {
+         u8g.print(itostr3(int(degTargetHotend(extrdr) + 0.5)));
+         lcd_printPGM(PSTR(LCD_STR_DEGREE " "));
+     }
+     else 
+         u8g.print(" off");
+    
+    		 u8g.setColorIndex(1);	// white on black
+     u8g.setPrintPos(start_spacing+(graphic_spacing*extrdr),27);
+     u8g.print(itostr3(int(degHotend(extrdr) + 0.5)));
+     lcd_printPGM(PSTR(LCD_STR_DEGREE " "));
+    
+     if (isHeatingHotend(extrdr))
+         u8g.drawBitmapP(start_spacing+(graphic_spacing*extrdr)+19,0,HEATING_BMPBYTEWIDTH,HEATING_BMPHEIGHT,&Heating_bmp[1*2*animate_pos]);
+     
+     if (coolingFans[extrdr])
+         u8g.drawBitmapP(start_spacing+(graphic_spacing*extrdr)-5,1,AIR_BMPBYTEWIDTH,AIR_BMPHEIGHT,&AIR_bmp[1*5*animate_pos]);
+ }
+
  // Heatbed
  u8g.setFont(FONT_STATUSMENU);
- u8g.setPrintPos(81,6);
+ u8g.setPrintPos(start_spacing+(graphic_spacing*EXTRUDERS),6);
  u8g.print(itostr3(int(degTargetBed() + 0.5)));
  lcd_printPGM(PSTR(LCD_STR_DEGREE " "));
- u8g.setPrintPos(81,27);
+ u8g.setPrintPos(start_spacing+(graphic_spacing*EXTRUDERS),27);
  u8g.print(itostr3(int(degBed() + 0.5)));
  lcd_printPGM(PSTR(LCD_STR_DEGREE " "));
- if (!isHeatingBed()) u8g.drawBox(88,18,2,2);
-	else
-		{
-		 u8g.setColorIndex(0);	// white on black
-		 u8g.drawBox(88,18,2,2);
-		 u8g.setColorIndex(1);	// black on white
-		}
+ if (!isHeatingBed())
+ {
+     u8g.drawFrame(start_spacing+(graphic_spacing*EXTRUDERS),17,22,3);
+     u8g.setPrintPos(start_spacing+(graphic_spacing*EXTRUDERS)+2,16);
+     u8g.print("off");
+ }
+ else
+ {
+     u8g.drawBox(start_spacing+(graphic_spacing*EXTRUDERS),17,22,3);
+     u8g.drawBitmapP(start_spacing+(graphic_spacing*EXTRUDERS),8,HEATBED_BMPBYTEWIDTH,HEATBED_BMPHEIGHT,&Heatbed_bmp[3*2*animate_pos]);
+ }
  
  // Fan
- u8g.setFont(FONT_STATUSMENU);
- u8g.setPrintPos(104,27);
  #if defined(FAN_PIN) && FAN_PIN > -1
- u8g.print(itostr3(int((fanSpeed*100)/256 + 1)));
- u8g.print("%");
- #else
- u8g.print("---");
+    if ( fanSpeed ) // animated fan
+      u8g.drawBitmapP(start_spacing+(graphic_spacing*(EXTRUDERS+1))+3,1,FAN_BMPBYTEWIDTH,FAN_BMPHEIGHT,(const u8g_pgm_uint8_t*)Fans_bmp[animate_pos]);
+    else
+      u8g.drawBitmapP(start_spacing+(graphic_spacing*(EXTRUDERS+1))+3,1,FAN_BMPBYTEWIDTH,FAN_BMPHEIGHT,(const u8g_pgm_uint8_t*)Fans_bmp[1]);
+    
+    u8g.setFont(FONT_STATUSMENU);
+    u8g.setPrintPos(start_spacing+(graphic_spacing*(EXTRUDERS+1)),27);
+    if(0==fanSpeed)
+        u8g.print(" off");
+    else
+    {
+        u8g.print(itostr3(int((fanSpeed*100)/256 + 1)));
+        u8g.print("%");
+    }
  #endif
  
  
